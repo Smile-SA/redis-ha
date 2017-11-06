@@ -5,13 +5,14 @@
 if [ $MODE == "statefulset" ] && [ $SENTINEL != "true" ] ; then
 
     h=$(hostname)
-    full=$(hostname -f)
     if [ $(echo "$h" | grep '\-0') == "-0" ]; then
         # we're the master
-        sed -i 's/^slaveof master 6379/slaveof '${full}' 6379/' /etc/redis-slave.conf
+        sed -i 's/^slaveof master 6379/slaveof 127.0.0.1 6379/' /etc/redis-slave.conf
         exec "$@"
     fi
 
+
+    # else, slave (sentinel will start, so wait for it)
     CONN=""
     SENTINEL_HOST="127.0.0.1"
     until [ "$CONN" == "ok" ]; do
@@ -31,9 +32,15 @@ fi
 # else, startup as expected
 
 if [ "$SENTINEL" == "true" ]; then
+    if [ $MODE == "statefulset" ] && [ $SENTINEL != "true" ] ; then
+        h=$(hostname -f | sed '/-\d/-0/')
+        sed -i 's/monitor mymaster master/monitor mymaster '$h'/' /etc/redis-sentinel.conf 
+    fi
     exec redis-sentinel /etc/redis-sentinel.conf
 fi
 
+
+# this case should not happend in openshift
 if [ "$SLAVE" == "true" ]; then
     # if we're on kubernetes/openshift, the sentinel should be running as
     # a container in the same pod. So that sentinel addr is 127.0.0.1
