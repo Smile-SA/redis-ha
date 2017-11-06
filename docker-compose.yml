@@ -1,0 +1,20 @@
+version: "2"
+
+services:
+  master:
+    build: docker
+
+  sentinel:
+    build: docker
+    environment:
+      SENTINEL: "true"
+    depends_on:
+      - master
+
+  slave:
+    build: docker
+    environment:
+      SLAVE: "true"
+      SENTINEL_HOST: "sentinel"
+    depends_on:
+      - master
