@@ -4,10 +4,10 @@
 
 if [ $MODE == "statefulset" ] && [ $SENTINEL != "true" ] ; then
 
+
+    # first node is a master
     h=$(hostname)
     if [ $(echo "$h" | grep '\-0') == "-0" ]; then
-        # we're the master
-        sed -i 's/^slaveof master 6379/slaveof 127.0.0.1 6379/' /etc/redis-slave.conf
         exec "$@"
     fi
 
@@ -32,7 +32,7 @@ fi
 # else, startup as expected
 
 if [ "$SENTINEL" == "true" ]; then
-    if [ $MODE == "statefulset" ] && [ $SENTINEL != "true" ] ; then
+    if [ $MODE == "statefulset" ]; then
         h=$(hostname -f | sed '/-\d/-0/')
         sed -i 's/monitor mymaster master/monitor mymaster '$h'/' /etc/redis-sentinel.conf 
     fi
