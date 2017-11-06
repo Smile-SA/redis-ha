@@ -33,7 +33,7 @@ fi
 
 if [ "$SENTINEL" == "true" ]; then
     if [ $MODE == "statefulset" ]; then
-        h=$(hostname -f | sed '/-\d/-0/')
+        h=$(hostname -f | sed -r 's/-[0-9]+/-0/')
         sed -i 's/monitor mymaster master/monitor mymaster '$h'/' /etc/redis-sentinel.conf 
     fi
     exec redis-sentinel /etc/redis-sentinel.conf
