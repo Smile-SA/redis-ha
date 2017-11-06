@@ -1,5 +1,35 @@
 #!/bin/bash
 
+# Openshift Mode
+
+if [ $MODE == "statefulset" ] && [ $SENTINEL != "true" ] ; then
+
+    h=$(hostname)
+    full=$(hostname -f)
+    if [ $(echo "$h" | grep '\-0') == "-0" ]; then
+        # we're the master
+        sed -i 's/^slaveof master 6379/slaveof '${full}' 6379/' /etc/redis-slave.conf
+        exec "$@"
+    fi
+
+    CONN=""
+    SENTINEL_HOST="127.0.0.1"
+    until [ "$CONN" == "ok" ]; do
+        nc --send-only $SENTINEL_HOST 26379 < /dev/null && CONN="ok" || sleep 1
+    done
+
+    CONN=""
+    until [ "$CONN" == "ok" ]; do
+        master=$(redis-cli -h $SENTINEL_HOST -p 26379 SENTINEL get-master-addr-by-name mymaster | head -n1)
+        nc --send-only $master 6379 < /dev/null && CONN="ok" || sleep 1
+    done
+
+    sed -i 's/^slaveof master 6379/slaveof '${master}' 6379/' /etc/redis-slave.conf
+    exec redis-server /etc/redis-slave.conf
+fi
+
+# else, startup as expected
+
 if [ "$SENTINEL" == "true" ]; then
     exec redis-sentinel /etc/redis-sentinel.conf
 fi
