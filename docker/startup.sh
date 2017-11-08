@@ -42,7 +42,7 @@ if [ "$SENTINEL" == "true" ]; then
         # check that master is up
         CONN=""
         until [ "$CONN" == "ok" ]; do
-            nc --send-only $h 26379 < /dev/null && CONN="ok" || sleep 1
+            nc --send-only $h 6379 < /dev/null && CONN="ok" || sleep 1
         done
     fi
 
