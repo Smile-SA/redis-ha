@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Openshift Mode
-if [ $MODE == "statefulset" ] && [ $SENTINEL != "true" ] ; then
+if [ "$MODE" == "statefulset" ] && [ "$SENTINEL" != "true" ] ; then
 
     # first statefulset pod is a master
     h=$(hostname)

@@ -2,7 +2,7 @@ FROM openshift/base-centos7
 
 RUN set -xe; \
     yum install -y epel-release; \
-    yum install -y redis nc; \
+    yum install -y redis nc bind-utils; \
     yum clean all;
 
 ADD redis-sentinel.conf /etc/redis-sentinel.conf
