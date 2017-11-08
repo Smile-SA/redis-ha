@@ -5,9 +5,7 @@ if [ "$MODE" == "statefulset" ] && [ "$SENTINEL" != "true" ] ; then
 
     # first statefulset pod is a master
     h=$(hostname)
-    echo $h
-    echo "$h" | grep '\-0'
-    if [ $(echo "$h" | grep '\-0') == "-0" ]; then
+    if [ $(echo "$h" | grep -o '\-0$') == "-0" ]; then
         echo "Master mode"
         exec "$@"
     fi
