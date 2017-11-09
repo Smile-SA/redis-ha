@@ -12,6 +12,6 @@ ADD startup.sh /startup.sh
 EXPOSE 26379 6379
 ENTRYPOINT ["/startup.sh"]
 RUN set -xe ;\
-    chown default /var/lib/redis
+    fix-permissions /var/lib/redis
 USER 1001
 CMD ["redis-server", "/etc/redis.conf"]
