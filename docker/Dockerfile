@@ -11,4 +11,7 @@ ADD redis-slave.conf /etc/redis-slave.conf
 ADD startup.sh /startup.sh
 EXPOSE 26379 6379
 ENTRYPOINT ["/startup.sh"]
+RUN set -xe ;\
+    chown default /var/lib/redis
+USER 1001
 CMD ["redis-server", "/etc/redis.conf"]
