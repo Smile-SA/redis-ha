@@ -35,7 +35,7 @@ fi
 
 if [ "$SENTINEL" == "true" ]; then
     echo "Sentinel mode"
-    if [ $MODE == "statefulset" ]; then
+    if [ "$MODE" == "statefulset" ]; then
         # we change xxx-1 to xxx-0 that is the master pod
         h=$(hostname -f | sed -r 's/-[0-9]+/-0/')
         sed -i 's/monitor mymaster master/monitor mymaster '$h'/' /etc/redis-sentinel.conf 
